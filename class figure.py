@@ -1,0 +1,171 @@
+import pygame
+from random import choice
+
+stack_height_cells = 24
+stack_width_cells = 12
+
+cell_size = 20
+stack_width_px = stack_width_cells * cell_size
+stack_height_px = stack_height_cells * cell_size
+
+pole = [[0 for i in range(stack_width_cells)]
+        for j in range(stack_height_cells)]
+
+for i in range(stack_height_cells):
+    pole[i][0] = 3
+    pole[i][stack_width_cells - 1] = 3
+for i in range(stack_width_cells):
+    pole[stack_height_cells - 1][i] = 3
+
+
+pygame.init()
+screen = pygame.display.set_mode((stack_width_px, stack_height_px))
+screen.fill(pygame.Color('black'))
+clock = pygame.time.Clock()
+fps = 60
+
+
+class Figure:
+    def __init__(self, form):
+        self.points = list()
+        self.tr = 1
+        if form == 'I':
+            for i in range(4):
+                self.points.append([0, i + 4])
+        elif form == "T":
+            for i in range(3):
+                self.points.append([0, i + 4])
+            self.points.append([1, 5])
+        elif form == 'J':
+            self.points.append([0, 4])
+            for i in range(3):
+                self.points.append([1, i + 4])
+        elif form == 'L':
+            self.points.append([0, 6])
+            for i in range(3):
+                self.points.append([1, i + 4])
+        elif form == 'O':
+            for i in range(2):
+                self.points.append([0, i + 4])
+                self.points.append([1, i + 4])
+        elif form == 'S':
+            for i in range(2):
+                self.points.append([0, i + 4])
+                self.points.append([1, i + 3])
+        elif form == 'Z':
+            for i in range(2):
+                self.points.append([0, i + 3])
+            for i in range(2):
+                self.points.append([1, i + 4])
+
+    def get_coords(self):
+        return self.points
+
+    def falling(self):
+        global pole, trg
+        tr = 1
+        for i in range(len(self.points)):
+            x = self.points[len(self.points) - i - 1][0]
+            y = self.points[len(self.points) - i - 1][1]
+            point = pole[x + 1][y]
+            if point == 3 or point == 2 or self.tr == 0:
+                tr = 0
+        for i in range(len(self.points)):
+            x = self.points[len(self.points) - i - 1][0]
+            y = self.points[len(self.points) - i - 1][1]
+            if tr:
+                pole[x][y] = 0
+                pole[x + 1][y] = 1
+                self.points[len(self.points) - i - 1] = [x + 1, y]
+            else:
+                pole[x][y] = 2
+                self.tr = 0
+                trg = 1
+
+    def left(self):
+        global pole
+        tr = 1
+        for i in range(len(self.points)):
+            x = self.points[i][0]
+            y = self.points[i][1]
+            point = pole[x][y - 1]
+            if point != 1 and point != 0:
+                tr = 0
+        if tr:
+            for i in range(len(self.points)):
+                x = self.points[i][0]
+                y = self.points[i][1]
+                pole[x][y] = 0
+                pole[x][y - 1] = 1
+                self.points[i] = [x, y - 1]
+
+    def right(self):
+        global pole
+        tr = 1
+        for i in range(len(self.points)):
+            x = self.points[i][0]
+            y = self.points[i][1]
+            point = pole[x][y + 1]
+            if point != 1 and point != 0:
+                tr = 0
+        if tr:
+            for i in range(len(self.points)):
+                x = self.points[len(self.points) - i - 1][0]
+                y = self.points[len(self.points) - i - 1][1]
+                pole[x][y] = 0
+                pole[x][y + 1] = 1
+                self.points[len(self.points) - i - 1] = [x, y + 1]
+
+    def rotate(self):
+        global pole
+
+
+def render():
+    screen.fill(pygame.Color('black'))
+    for i in range(stack_height_cells):
+        for j in range(stack_width_cells):
+            if pole[i][j] == 1:
+                pygame.draw.rect(screen, pygame.Color('green'), (j * cell_size + 1,
+                                                                 i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+            elif pole[i][j] == 0:
+                pygame.draw.rect(screen, pygame.Color('gray'), (j * cell_size + 1,
+                                                                i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+            elif pole[i][j] == 2:
+                pygame.draw.rect(screen, pygame.Color('yellow'), (j * cell_size + 1,
+                                                                  i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+            elif pole[i][j] == 3:
+                pygame.draw.rect(screen, pygame.Color('red'), (j * cell_size + 1,
+                                                               i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+
+
+im = ('I', 'J', 'L', 'O', 'S', 'T', 'Z')
+
+
+a = 60
+run = True
+trg = 1
+c = 1
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                figure.left()
+            if event.key == pygame.K_RIGHT:
+                figure.right()
+        if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                a = 0
+    pygame.display.flip()
+    render()
+    if a < 0:
+        a = 60
+        figure.falling()
+    else:
+        a -= 1
+    clock.tick(fps)
+    if trg:
+        figure = Figure(choice(im))
+        trg = 0
+pygame.quit()

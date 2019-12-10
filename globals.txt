@@ -8,4 +8,3 @@ Variables:
 	cell_size = 20
 	stack_width_px = stack_width_cells * cell_size
 	stack_height_px = stack_height_cells * cell_size
-
