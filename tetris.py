@@ -9,6 +9,8 @@ cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
 
+score = 0
+
 # инициализация игрового поля
 
 pole = [[0 for i in range(stack_width_cells)]
@@ -29,6 +31,7 @@ screen = pygame.display.set_mode((stack_width_px, stack_height_px))
 screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 fps = 60
+
 
 # класс спрайтов
 
@@ -230,6 +233,7 @@ class Figure:
                     pole[x - 1][y + 1] = 1
                     pole[x - 1][y] = 1
                     pole[x + 1][y] = 1
+
             elif self.orn == 2:
                 if (pole[x][y + 1] + pole[x][y - 1] + pole[x + 1][y + 1]) == 0:
                     self.orn = 3
@@ -429,7 +433,22 @@ class Figure:
                     pole[x - 1][y - 1] = 1
                     pole[x][y + 1] = 1
 
-# функция отрисовки экрана
+    # удаление полных слоёв
+
+    def checkout(self):
+        global pole, stack_height_cells, stack_width_cells, score
+        newpole = []
+        for i in range(stack_height_cells):
+            if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
+                newpole.append(pole[0])
+                score += 1000
+        for i in range(stack_height_cells):
+            if sum(pole[i]) != (stack_width_cells - 2) * 2 + 6:
+                newpole.append(pole[i])
+        pole = newpole[:][:]
+
+
+# фуdнкция отрисовки экрана
 
 
 def render():
@@ -451,7 +470,8 @@ def render():
 
 
 im = ('I', 'J', 'L', 'O', 'S', 'T', 'Z')
-a = 60  # скорость игры (fps = 60 / a)
+a = 0  # скорость игры (fps = 60 / a)
+b = 60
 run = True
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
 while run:
@@ -465,18 +485,33 @@ while run:
                 figure.right()
             if event.key == pygame.K_UP:
                 figure.rotate()
+            if event.key == pygame.K_p and b > 19:
+                b -= 10
+            if event.key == pygame.K_m and b < 51:
+                b += 10
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                figure.left()
+            if event.button == 4:
+                figure.rotate()
+            if event.button == 5:
+                a = -1
+            if event.button == 3:
+                figure.right()
         if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 a = -1
     pygame.display.flip()
     render()
     if a < 0:
-        a = 60
+        a = b
         figure.falling()
+        figure.checkout()
     else:
         a -= 1
     if trg:
         figure = Figure(choice(im))
         trg = 0
     clock.tick(fps)
+print(score)
 pygame.quit()
