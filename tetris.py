@@ -429,6 +429,8 @@ class Figure:
                     pole[x - 1][y - 1] = 1
                     pole[x][y + 1] = 1
 
+# функция отрисовки экрана
+
 
 def render():
     screen.fill(pygame.Color('black'))
@@ -449,9 +451,9 @@ def render():
 
 
 im = ('I', 'J', 'L', 'O', 'S', 'T', 'Z')
-a = 60
+a = 60  # скорость игры (fps = 60 / a)
 run = True
-trg = 1
+trg = 1  # флажок на ограничение количества объектов на поле одновремено
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -473,8 +475,8 @@ while run:
         figure.falling()
     else:
         a -= 1
-    clock.tick(fps)
     if trg:
         figure = Figure(choice(im))
         trg = 0
+    clock.tick(fps)
 pygame.quit()
