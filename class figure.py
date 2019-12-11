@@ -1,14 +1,20 @@
 import pygame
 from random import choice
 
-stack_height_cells = 24
-stack_width_cells = 12
+# переменный экрана
+
+stack_height_cells = 30
+stack_width_cells = 20
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
 
+# инициализация игрового поля
+
 pole = [[0 for i in range(stack_width_cells)]
         for j in range(stack_height_cells)]
+
+# создание рамок игрового поля
 
 for i in range(stack_height_cells):
     pole[i][0] = 3
@@ -16,6 +22,7 @@ for i in range(stack_height_cells):
 for i in range(stack_width_cells):
     pole[stack_height_cells - 1][i] = 3
 
+# создание окна
 
 pygame.init()
 screen = pygame.display.set_mode((stack_width_px, stack_height_px))
@@ -23,14 +30,19 @@ screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 fps = 60
 
+# класс спрайтов
+
 
 class Figure:
     def __init__(self, form):
         self.points = list()
-        self.orn = 1
-        self.tr = 1
-        self.r = 0
-        self.form = form
+        self.orn = 1  # положение объекта(вращение)
+        self.tr = 1  # флажок на остановку спрайта
+        self.r = 0  # количество поворотов
+        self.form = form  # форма спрайта
+
+        # описание формы спрайтаы
+
         if form == 'I':
             for i in range(4):
                 self.points.append([0, i + 4])
@@ -60,6 +72,8 @@ class Figure:
             for i in range(2):
                 self.points.append([1, i + 4])
 
+    # функция падения спрайта
+
     def falling(self):
         global pole, trg
         tr = 1
@@ -68,7 +82,7 @@ class Figure:
             y = self.points[len(self.points) - i - 1][1]
             point = pole[x + 1][y]
             if point == 3 or point == 2 or self.tr == 0:
-                tr = 0
+                tr = 0  # локальный флажок на условие сдвига вниз спрайта
         for i in range(len(self.points)):
             x = self.points[len(self.points) - i - 1][0]
             y = self.points[len(self.points) - i - 1][1]
@@ -85,6 +99,8 @@ class Figure:
             y = self.points[len(self.points) - i - 1][1]
             if tr:
                 pole[x][y] = 1
+
+    # функция сдвига спрайта влево
 
     def left(self):
         global pole
@@ -108,6 +124,8 @@ class Figure:
             if tr:
                 pole[x][y] = 1
 
+    # функция сдвига спрайта вправо
+
     def right(self):
         global pole
         tr = 1
@@ -129,6 +147,8 @@ class Figure:
             y = self.points[len(self.points) - i - 1][1]
             if tr:
                 pole[x][y] = 1
+
+    # функция поворота спрайта
 
     def rotate(self):
         global pole
