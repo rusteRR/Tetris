@@ -3,8 +3,8 @@ from random import choice
 
 # переменный экрана
 
-stack_height_cells = 30
-stack_width_cells = 20
+stack_height_cells = 17
+stack_width_cells = 13
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
@@ -438,14 +438,19 @@ class Figure:
     def checkout(self):
         global pole, stack_height_cells, stack_width_cells, score
         newpole = []
+        tr = 0
         for i in range(stack_height_cells):
             if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
-                newpole.append(pole[0])
-                score += 1000
-        for i in range(stack_height_cells):
-            if sum(pole[i]) != (stack_width_cells - 2) * 2 + 6:
-                newpole.append(pole[i])
-        pole = newpole[:][:]
+                tr = 1
+        if tr == 1:
+            for i in range(stack_height_cells):
+                if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
+                    newpole.append(pole[0])
+                    score += 1000
+            for i in range(stack_height_cells):
+                if sum(pole[i]) != (stack_width_cells - 2) * 2 + 6:
+                    newpole.append(pole[i])
+            pole = newpole[:]
 
 
 # фуdнкция отрисовки экрана
@@ -453,14 +458,15 @@ class Figure:
 
 def render():
     screen.fill(pygame.Color('black'))
+    col = ['green', 'purple', 'blue', 'orange']
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             if pole[i][j] == 1:
                 pygame.draw.rect(screen, pygame.Color('green'), (j * cell_size + 1,
                                                                  i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 0:
-                pygame.draw.rect(screen, pygame.Color('gray'), (j * cell_size + 1,
-                                                                i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, pygame.Color('white'), (j * cell_size + 1,
+                                                                 i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 2:
                 pygame.draw.rect(screen, pygame.Color('yellow'), (j * cell_size + 1,
                                                                   i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
@@ -470,48 +476,55 @@ def render():
 
 
 im = ('I', 'J', 'L', 'O', 'S', 'T', 'Z')
-a = 0  # скорость игры (fps = 60 / a)
-b = 60
+a = 0
+b = 50
+counter = 0
 run = True
+ti = 0
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
 while run:
+    ti += 1
     for event in pygame.event.get():
+        key = pygame.key.get_pressed()
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                figure.left()
-            if event.key == pygame.K_RIGHT:
-                figure.right()
-            if event.key == pygame.K_UP:
-                figure.rotate()
-            if event.key == pygame.K_p and b > 19:
-                b -= 10
-            if event.key == pygame.K_m and b < 51:
-                b += 10
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                figure.left()
-            if event.button == 4:
-                figure.rotate()
-            if event.button == 5:
-                a = -1
-            if event.button == 3:
-                figure.right()
-        if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                a = -1
+    if key[pygame.K_LEFT] and ti > 10:
+        figure.left()
+        ti = 0
+    if key[pygame.K_RIGHT] and ti > 10:
+        figure.right()
+        ti = 0
+    if key[pygame.K_UP] and ti > 10:
+        figure.rotate()
+        ti = 0
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #     if event.button == 1:
+        #         figure.left()
+        #     if event.button == 4:
+        #         figure.rotate()
+        #     if event.button == 5:
+        #         a = -1
+        #     if event.button == 3:
+        #         figure.right()
+
+    if key[pygame.K_DOWN] and ti > 5:
+        a = -1
+        ti = 0
     pygame.display.flip()
     render()
     if a < 0:
         a = b
         figure.falling()
         figure.checkout()
+        if counter > 5:
+            counter = 0
+            b -= 2
     else:
         a -= 1
     if trg:
         figure = Figure(choice(im))
         trg = 0
+        counter += 1
     clock.tick(fps)
-print(score)
+print('Your score', score)
 pygame.quit()
