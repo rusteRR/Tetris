@@ -3,11 +3,12 @@ from random import choice
 
 # переменный экрана
 
-stack_height_cells = 17
+stack_height_cells = 20
 stack_width_cells = 13
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
+
 
 score = 0
 
@@ -15,6 +16,7 @@ score = 0
 
 pole = [[0 for i in range(stack_width_cells)]
         for j in range(stack_height_cells)]
+s_o = pole[0]
 
 # создание рамок игрового поля
 
@@ -23,6 +25,8 @@ for i in range(stack_height_cells):
     pole[i][stack_width_cells - 1] = 3
 for i in range(stack_width_cells):
     pole[stack_height_cells - 1][i] = 3
+
+pole0 = [pole[0]]
 
 # создание окна
 
@@ -77,29 +81,32 @@ class Figure:
 
     # функция падения спрайта
 
+    def delete(self, i):
+        global pole, stack_width_cells, pole0
+        del pole[i]
+        pole = pole0 + pole
+
     def falling(self):
         global pole, trg
         tr = 1
         for i in range(len(self.points)):
-            x = self.points[len(self.points) - i - 1][0]
-            y = self.points[len(self.points) - i - 1][1]
+            x, y = self.points[i]
             point = pole[x + 1][y]
             if point == 3 or point == 2 or self.tr == 0:
                 tr = 0  # локальный флажок на условие сдвига вниз спрайта
+                print(tr)
         for i in range(len(self.points)):
-            x = self.points[len(self.points) - i - 1][0]
-            y = self.points[len(self.points) - i - 1][1]
+            x, y = self.points[i]
             if tr:
                 pole[x][y] = 0
-                self.points[len(self.points) - i - 1] = [x + 1, y]
+                self.points[i] = [x + 1, y]
             else:
                 pole[x][y] = 2
                 self.tr = 0
                 trg = 1
 
         for i in range(len(self.points)):
-            x = self.points[len(self.points) - i - 1][0]
-            y = self.points[len(self.points) - i - 1][1]
+            x, y = self.points[i]
             if tr:
                 pole[x][y] = 1
 
@@ -437,20 +444,10 @@ class Figure:
 
     def checkout(self):
         global pole, stack_height_cells, stack_width_cells, score
-        newpole = []
-        tr = 0
         for i in range(stack_height_cells):
             if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
-                tr = 1
-        if tr == 1:
-            for i in range(stack_height_cells):
-                if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
-                    newpole.append(pole[0])
-                    score += 1000
-            for i in range(stack_height_cells):
-                if sum(pole[i]) != (stack_width_cells - 2) * 2 + 6:
-                    newpole.append(pole[i])
-            pole = newpole[:]
+                self.delete(i)
+                score += 100
 
 
 # фуdнкция отрисовки экрана
@@ -514,8 +511,8 @@ while run:
     render()
     if a < 0:
         a = b
-        figure.falling()
         figure.checkout()
+        figure.falling()
         if counter > 5:
             counter = 0
             b -= 2
