@@ -1,22 +1,24 @@
 import pygame
+import numpy as np
 from random import choice
 
 # переменный экрана
 
-stack_height_cells = 20
-stack_width_cells = 13
+stack_height_cells = 16
+stack_width_cells = 8
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
-
 
 score = 0
 
 # инициализация игрового поля
 
-pole = [[0 for i in range(stack_width_cells)]
-        for j in range(stack_height_cells)]
-s_o = pole[0]
+# pole = [[0 for i in range(stack_width_cells)]
+#         for j in range(stack_height_cells)]
+
+pole = np.zeros(stack_width_cells *
+                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание рамок игрового поля
 
@@ -26,7 +28,10 @@ for i in range(stack_height_cells):
 for i in range(stack_width_cells):
     pole[stack_height_cells - 1][i] = 3
 
-pole0 = [pole[0]]
+s_o = pole[0:0, :]
+# [0 for i in range(stack_width_cells)]
+# s_o[0] = 3
+# s_o[-1] = 3
 
 # создание окна
 
@@ -52,7 +57,7 @@ class Figure:
 
         if form == 'I':
             for i in range(4):
-                self.points.append([0, i + 4])
+                self.points.append([0, i + 1])
         elif form == "T":
             for i in range(3):
                 self.points.append([0, i + 4])
@@ -81,32 +86,29 @@ class Figure:
 
     # функция падения спрайта
 
-    def delete(self, i):
-        global pole, stack_width_cells, pole0
-        del pole[i]
-        pole = pole0 + pole
-
     def falling(self):
         global pole, trg
         tr = 1
         for i in range(len(self.points)):
-            x, y = self.points[i]
+            x = self.points[len(self.points) - i - 1][0]
+            y = self.points[len(self.points) - i - 1][1]
             point = pole[x + 1][y]
             if point == 3 or point == 2 or self.tr == 0:
                 tr = 0  # локальный флажок на условие сдвига вниз спрайта
-                print(tr)
         for i in range(len(self.points)):
-            x, y = self.points[i]
+            x = self.points[len(self.points) - i - 1][0]
+            y = self.points[len(self.points) - i - 1][1]
             if tr:
                 pole[x][y] = 0
-                self.points[i] = [x + 1, y]
+                self.points[len(self.points) - i - 1] = [x + 1, y]
             else:
                 pole[x][y] = 2
                 self.tr = 0
                 trg = 1
 
         for i in range(len(self.points)):
-            x, y = self.points[i]
+            x = self.points[len(self.points) - i - 1][0]
+            y = self.points[len(self.points) - i - 1][1]
             if tr:
                 pole[x][y] = 1
 
@@ -443,11 +445,22 @@ class Figure:
     # удаление полных слоёв
 
     def checkout(self):
-        global pole, stack_height_cells, stack_width_cells, score
+        global pole, stack_height_cells, stack_width_cells, score, s_o
+        newpole = []
+        sp = []
+        tr = 0
         for i in range(stack_height_cells):
             if sum(pole[i]) == (stack_width_cells - 2) * 2 + 6:
-                self.delete(i)
+                tr = 1
+                sp.append(i)
+        if tr == 1:
+            for i in range(len(sp)):
+                newpole.append(s_o)
                 score += 100
+            for i in range(stack_height_cells):
+                if sum(pole[i]) != (stack_width_cells - 2) * 2 + 6 and not(i in sp):
+                    newpole.append(pole[i])
+            pole = newpole[:]
 
 
 # фуdнкция отрисовки экрана
@@ -462,7 +475,7 @@ def render():
                 pygame.draw.rect(screen, pygame.Color('green'), (j * cell_size + 1,
                                                                  i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 0:
-                pygame.draw.rect(screen, pygame.Color('white'), (j * cell_size + 1,
+                pygame.draw.rect(screen, pygame.Color('black'), (j * cell_size + 1,
                                                                  i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 2:
                 pygame.draw.rect(screen, pygame.Color('yellow'), (j * cell_size + 1,
@@ -473,55 +486,53 @@ def render():
 
 
 im = ('I', 'J', 'L', 'O', 'S', 'T', 'Z')
-a = 0
-b = 50
-counter = 0
-run = True
-ti = 0
+
+fugire_counter = 0
+timer_falling = 0
+max_timer_falling = 60
+timer_move = 0
+
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
+run = True
 while run:
-    ti += 1
+    render()
+    pygame.display.flip()
+
+    timer_move += 1
+
     for event in pygame.event.get():
         key = pygame.key.get_pressed()
         if event.type == pygame.QUIT:
             run = False
-    if key[pygame.K_LEFT] and ti > 10:
+    if key[pygame.K_LEFT] and timer_move > 10:
         figure.left()
-        ti = 0
-    if key[pygame.K_RIGHT] and ti > 10:
+        timer_move = 0
+    if key[pygame.K_RIGHT] and timer_move > 10:
         figure.right()
-        ti = 0
-    if key[pygame.K_UP] and ti > 10:
+        timer_move = 0
+    if key[pygame.K_UP] and timer_move > 10:
         figure.rotate()
-        ti = 0
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     if event.button == 1:
-        #         figure.left()
-        #     if event.button == 4:
-        #         figure.rotate()
-        #     if event.button == 5:
-        #         a = -1
-        #     if event.button == 3:
-        #         figure.right()
+        timer_move = 0
+    if key[pygame.K_DOWN] and timer_move > 5:
+        timer_move = 0
+        timer_falling = -1
 
-    if key[pygame.K_DOWN] and ti > 5:
-        a = -1
-        ti = 0
-    pygame.display.flip()
-    render()
-    if a < 0:
-        a = b
+    if timer_falling < 0:
+        timer_falling = max_timer_falling
         figure.checkout()
         figure.falling()
-        if counter > 5:
-            counter = 0
-            b -= 2
+        if fugire_counter > 5:
+            fugire_counter = 0
+            max_timer_falling -= 5
     else:
-        a -= 1
+        timer_falling -= 1
+
     if trg:
         figure = Figure(choice(im))
         trg = 0
-        counter += 1
+        fugire_counter += 1
+
     clock.tick(fps)
+
 print('Your score', score)
 pygame.quit()
