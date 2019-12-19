@@ -2,10 +2,10 @@ import pygame
 import numpy as np
 from random import choice
 
-# переменный экрана
+# переменные экрана
 
 stack_height_cells = 20
-stack_width_cells = 14
+stack_width_cells = 10
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
@@ -23,18 +23,8 @@ figures = np.array([np.array([1, 1, 1, 0, 1, 0]),
 
 # инициализация игрового поля
 
-pole = np.zeros(stack_width_cells
-                * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
-
-# создание рамок игрового поля
-
-# for i in range(stack_height_cells):
-#     pole[i][0] = 3
-#     pole[i][stack_width_cells - 1] = 3
-# for i in range(stack_width_cells):
-#     pole[stack_height_cells - 1][i] = 3
-
-s_o = pole[0][:]
+pole = np.zeros(stack_width_cells *
+                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание окна
 
@@ -79,18 +69,16 @@ class Figure:
                 else:
                     tr = 0
         if tr == 1:
-            print(pole[x:x + len(self.points), y:y + len(self.points[0])])
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y + len(self.points[0])] == 1] = 0
             x += 1
             self.coords[0] += 1
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])] += self.points
-        else:
             pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                             len(self.points[0])] == 1] = 2
+                 len(self.points[0])] += self.points
+        else:
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                           len(self.points[0])] == 1] = 2
             self.tr = 0
             trg = 1
 
@@ -108,13 +96,13 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y
-                                           + len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                           len(self.points[0])] == 1] = 0
             y -= 1
             self.coords[1] -= 1
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])] += self.points
 
     # функция сдвига спрайта вправо
 
@@ -130,55 +118,46 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y
-                                           + len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                           len(self.points[0])] == 1] = 0
             y += 1
             self.coords[1] += 1
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])] += self.points
 
     # функция поворота спрайта
 
     def rotate(self):
         global pole
         x, y = self.coords
-        pole[x:x + len(self.points), y:y
-             + len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                       len(self.points[0])] == 1] = 0
+        pole[x:x + len(self.points), y:y +
+             len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                         len(self.points[0])] == 1] = 0
         self.points = np.rot90(self.points, -1)
         if len(self.points[0]) == 5:
             if (y - 2) > stack_width_cells:
                 self.points = np.rot90(self.points)
 
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])] += self.points
         else:
             if (y + len(self.points[0])) > stack_width_cells:
                 self.points = np.rot90(self.points)
 
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])] += self.points
 
     # удаление полных слоёв
 
     def checkout(self):
-        global pole, stack_height_cells, stack_width_cells, score, s_o
-        newpole = []
-        sp = []
-        tr = 0
+        global pole, stack_height_cells, stack_width_cells, score
         for i in range(stack_height_cells):
             if sum(pole[i]) == stack_width_cells * 2:
-                tr = 1
-                sp.append(i)
-        if tr == 1:
-            for i in range(len(sp)):
-                newpole.append(s_o)
+                pole = np.delete(pole, i, 0)
+                pole = np.insert(pole, 0, [0 for i in range(stack_width_cells)]).reshape(
+                    stack_height_cells, stack_width_cells)
                 score += 100
-            for i in range(stack_height_cells):
-                if sum(pole[i]) != stack_width_cells * 2 and not(i in sp):
-                    newpole.append(pole[i])
-            pole = newpole[:]
 
 
 # фуdнкция отрисовки экрана
@@ -220,8 +199,12 @@ while run:
 
     for event in pygame.event.get():
         key = pygame.key.get_pressed()
+        mouse = pygame.mouse.get_pressed()
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 4:
+                figure.rotate()
     if key[pygame.K_LEFT] and timer_move > 10:
         figure.left()
         timer_move = 0
@@ -232,6 +215,16 @@ while run:
         figure.rotate()
         timer_move = 0
     if key[pygame.K_DOWN] and timer_move > 5:
+        timer_move = 0
+        timer_falling = -1
+
+    if mouse[0] and timer_move > 10:
+        figure.left()
+        timer_move = 0
+    if mouse[2] and timer_move > 10:
+        figure.right()
+        timer_move = 0
+    if mouse[1] and timer_move > 5:
         timer_move = 0
         timer_falling = -1
 
