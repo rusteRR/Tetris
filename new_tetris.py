@@ -182,7 +182,19 @@ def render():
                                                                i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
 
 
-im = ('T', 'L', 'J', 'S', 'Z', 'I', 'O')
+def next_figure(i):
+    return next_figures[i]
+
+
+im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
+
+available_figures = im[:]
+next_figures = []
+next_figures.append(available_figures.pop(
+    available_figures.index(choice(available_figures))))
+next_figures.append(available_figures.pop(
+    available_figures.index(choice(available_figures))))
+available_figures.append(next_figures[0])
 
 fugire_counter = 0
 timer_falling = 0
@@ -239,7 +251,10 @@ while run:
         timer_falling -= 1
 
     if trg:
-        figure = Figure(choice(im))
+        figure = Figure(next_figures.pop(0))
+        next_figures.append(available_figures.pop(
+            available_figures.index(choice(im))))
+        available_figures.append(next_figures[0])
         trg = 0
         fugire_counter += 1
 
