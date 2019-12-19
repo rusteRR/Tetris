@@ -17,8 +17,8 @@ score = 0
 # pole = [[0 for i in range(stack_width_cells)]
 #         for j in range(stack_height_cells)]
 
-pole = np.zeros(stack_width_cells *
-                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+pole = np.zeros(stack_width_cells
+                * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание рамок игрового поля
 
