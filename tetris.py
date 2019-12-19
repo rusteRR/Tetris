@@ -17,8 +17,8 @@ score = 0
 # pole = [[0 for i in range(stack_width_cells)]
 #         for j in range(stack_height_cells)]
 
-pole = np.zeros(stack_width_cells *
-                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+pole = np.zeros(stack_width_cells
+                * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание рамок игрового поля
 
@@ -492,7 +492,7 @@ timer_falling = 0
 max_timer_falling = 60
 timer_move = 0
 
-trg = 1  # флажок на ограничение количества объектов на поле одновремено
+trg = 1  # флажок на ограничение количества объектов на поле одновреме
 run = True
 while run:
     render()
