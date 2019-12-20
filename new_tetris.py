@@ -216,9 +216,9 @@ while run:
         mouse = pygame.mouse.get_pressed()
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 4:
-                figure.rotate()
+        # if event.type == pygame.MOUSEBUTTONUP:
+        #     if event.button == 4:
+        #         figure.rotate()
     if key[pygame.K_LEFT] and timer_move > 5:
         figure.left()
         timer_move = 0
@@ -232,15 +232,15 @@ while run:
         timer_move = 0
         timer_falling = -1
 
-    if mouse[0] and timer_move > 5:
-        figure.left()
-        timer_move = 0
-    if mouse[2] and timer_move > 5:
-        figure.right()
-        timer_move = 0
-    if mouse[1] and timer_move > 5:
-        timer_move = 0
-        timer_falling = -1
+    # if mouse[0] and timer_move > 5:
+    #     figure.left()
+    #     timer_move = 0
+    # if mouse[2] and timer_move > 5:
+    #     figure.right()
+    #     timer_move = 0
+    # if mouse[1] and timer_move > 5:
+    #     timer_move = 0
+    #     timer_falling = -1
 
     if timer_falling < 0:
         timer_falling = max_timer_falling
