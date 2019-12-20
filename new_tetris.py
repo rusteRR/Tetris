@@ -44,7 +44,7 @@ class Figure:
 
         self.tr = 1  # флажок на остановку спрайта
         self.form = form  # форма спрайта
-        self.coords = [0, 2]
+        self.coords = [-1, 3]
 
         # описание формы спрайтаы
 
@@ -188,13 +188,15 @@ def next_figure(i):
 
 im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
 
-available_figures = im[:]
+available_figures = im.copy()
 next_figures = []
-next_figures.append(available_figures.pop(
-    available_figures.index(choice(available_figures))))
-next_figures.append(available_figures.pop(
-    available_figures.index(choice(available_figures))))
+
+next_figures.append(choice(available_figures))
+available_figures.remove(next_figures[0])
+next_figures.append(choice(available_figures))
+available_figures.remove(next_figures[1])
 available_figures.append(next_figures[0])
+
 
 fugire_counter = 0
 timer_falling = 0
@@ -217,10 +219,10 @@ while run:
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 4:
                 figure.rotate()
-    if key[pygame.K_LEFT] and timer_move > 10:
+    if key[pygame.K_LEFT] and timer_move > 5:
         figure.left()
         timer_move = 0
-    if key[pygame.K_RIGHT] and timer_move > 10:
+    if key[pygame.K_RIGHT] and timer_move > 5:
         figure.right()
         timer_move = 0
     if key[pygame.K_UP] and timer_move > 10:
@@ -230,10 +232,10 @@ while run:
         timer_move = 0
         timer_falling = -1
 
-    if mouse[0] and timer_move > 10:
+    if mouse[0] and timer_move > 5:
         figure.left()
         timer_move = 0
-    if mouse[2] and timer_move > 10:
+    if mouse[2] and timer_move > 5:
         figure.right()
         timer_move = 0
     if mouse[1] and timer_move > 5:
@@ -252,9 +254,10 @@ while run:
 
     if trg:
         figure = Figure(next_figures.pop(0))
-        next_figures.append(available_figures.pop(
-            available_figures.index(choice(im))))
+        next_figures.append(choice(available_figures))
+        available_figures.remove(next_figures[1])
         available_figures.append(next_figures[0])
+
         trg = 0
         fugire_counter += 1
 
