@@ -44,7 +44,7 @@ class Figure:
 
         self.tr = 1  # флажок на остановку спрайта
         self.form = form  # форма спрайта
-        self.coords = [-1, 3]
+        self.coords = [0, 3]
 
         # описание формы спрайтаы
 
@@ -135,18 +135,26 @@ class Figure:
              len(self.points[0])][pole[x:x + len(self.points), y:y +
                                          len(self.points[0])] == 1] = 0
         self.points = np.rot90(self.points, -1)
-        if len(self.points[0]) == 5:
-            if (y - 2) > stack_width_cells:
-                self.points = np.rot90(self.points)
-
+        if (y + len(self.points[0])) > stack_width_cells:
+            self.points = np.rot90(self.points)
             pole[x:x + len(self.points), y:y +
                  len(self.points[0])] += self.points
         else:
-            if (y + len(self.points[0])) > stack_width_cells:
-                self.points = np.rot90(self.points)
-
+            pole1 = self.points + \
+                pole[x:x + len(self.points), y:y + len(self.points[0])]
+            self.points = np.rot90(self.points)
             pole[x:x + len(self.points), y:y +
                  len(self.points[0])] += self.points
+            if not(3 in pole1):
+                pole[x:x + len(self.points), y:y +
+                     len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                                 len(self.points[0])] == 1] = 0
+                self.points = np.rot90(self.points, -1)
+                if (y + len(self.points[0])) > stack_width_cells:
+                    self.points = np.rot90(self.points)
+
+                pole[x:x + len(self.points), y:y +
+                     len(self.points[0])] += self.points
 
     # удаление полных слоёв
 
