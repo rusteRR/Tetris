@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import os
 from random import choice
 
 # переменные экрана
@@ -7,8 +8,10 @@ from random import choice
 stack_height_cells = 20
 stack_width_cells = 10
 cell_size = 20
-stack_width_px = stack_width_cells * cell_size
-stack_height_px = stack_height_cells * cell_size
+stack_width_px = stack_width_cells * cell_size + 140
+stack_height_px = stack_height_cells * cell_size + cell_size * 2
+top = 20
+left = 20
 
 score = 0
 
@@ -23,8 +26,8 @@ figures = np.array([np.array([1, 1, 1, 0, 1, 0]),
 
 # инициализация игрового поля
 
-pole = np.zeros(stack_width_cells *
-                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+pole = np.zeros(stack_width_cells
+                * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание окна
 
@@ -69,16 +72,16 @@ class Figure:
                 else:
                     tr = 0
         if tr == 1:
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y + len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y + len(self.points[0])] == 1] = 0
             x += 1
             self.coords[0] += 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
-        else:
             pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 2
+                 + len(self.points[0])] += self.points
+        else:
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                             len(self.points[0])] == 1] = 2
             self.tr = 0
             trg = 1
 
@@ -96,13 +99,13 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y
+                                           + len(self.points[0])] == 1] = 0
             y -= 1
             self.coords[1] -= 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
 
     # функция сдвига спрайта вправо
 
@@ -118,43 +121,43 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y
+                                           + len(self.points[0])] == 1] = 0
             y += 1
             self.coords[1] += 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
 
     # функция поворота спрайта
 
     def rotate(self):
         global pole
         x, y = self.coords
-        pole[x:x + len(self.points), y:y +
-             len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                         len(self.points[0])] == 1] = 0
+        pole[x:x + len(self.points), y:y
+             + len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                       len(self.points[0])] == 1] = 0
         self.points = np.rot90(self.points, -1)
         if (y + len(self.points[0])) > stack_width_cells:
             self.points = np.rot90(self.points)
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
         else:
             pole1 = self.points + \
                 pole[x:x + len(self.points), y:y + len(self.points[0])]
             self.points = np.rot90(self.points)
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
             if not(3 in pole1):
-                pole[x:x + len(self.points), y:y +
-                     len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                                 len(self.points[0])] == 1] = 0
+                pole[x:x + len(self.points), y:y
+                     + len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                               len(self.points[0])] == 1] = 0
                 self.points = np.rot90(self.points, -1)
                 if (y + len(self.points[0])) > stack_width_cells:
                     self.points = np.rot90(self.points)
 
-                pole[x:x + len(self.points), y:y +
-                     len(self.points[0])] += self.points
+                pole[x:x + len(self.points), y:y
+                     + len(self.points[0])] += self.points
 
     # удаление полных слоёв
 
@@ -168,6 +171,19 @@ class Figure:
                 score += 100
 
 
+'''class Graphics:
+    def __init__(self):
+        self.create_icons()
+
+    def download_photo(self, name):
+        pass
+
+    def change_image(self):
+        pass
+
+    def create_icons(self):
+        self.sound_icon = load_image('sound.png')
+        screen.blit(self.sound_icon, (300, 200))'''
 # фуdнкция отрисовки экрана
 
 
@@ -177,21 +193,44 @@ def render():
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             if pole[i][j] == 1:
-                pygame.draw.rect(screen, pygame.Color('green'), (j * cell_size + 1,
-                                                                 i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, pygame.Color('green'), (left + j * cell_size + 1,
+                                                                 top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 0:
-                pygame.draw.rect(screen, pygame.Color('white'), (j * cell_size + 1,
-                                                                 i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, pygame.Color('white'), (left + j * cell_size + 1,
+                                                                 top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 2:
-                pygame.draw.rect(screen, pygame.Color('yellow'), (j * cell_size + 1,
-                                                                  i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, pygame.Color('yellow'), (left + j * cell_size + 1,
+                                                                  top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif pole[i][j] == 3:
-                pygame.draw.rect(screen, pygame.Color('red'), (j * cell_size + 1,
-                                                               i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, pygame.Color('red'), (left + j * cell_size + 1,
+                                                               top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
 
 
 def next_figure(i):
     return next_figures[i]
+
+
+def draw_border():
+    color = (80, 80, 80)
+    for i in range(stack_height_cells + 2):
+        pygame.draw.rect(screen, color, (0, i * cell_size + 1,
+                                         cell_size - 1, cell_size - 2), 0)
+    for i in range(stack_height_cells + 2):
+        pygame.draw.rect(screen, color, (left + stack_width_cells * cell_size + 1, i * cell_size + 1,
+                                         cell_size, cell_size - 2), 0)
+    for i in range(stack_width_cells):
+        pygame.draw.rect(screen, color, (left + 1 + i * cell_size, 1,
+                                         cell_size - 2, cell_size - 2), 0)
+    for i in range(stack_width_cells):
+        pygame.draw.rect(screen, color, (left + 1 + i * cell_size, top + stack_height_cells * cell_size + 1,
+                                         cell_size - 2, cell_size - 2), 0)
+
+
+def load_image(name):
+    fullname = os.path.join('data', name)
+    image = pygame.image.load(fullname)
+    image = image.convert_alpha()
+    return image
 
 
 im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
@@ -215,6 +254,8 @@ trg = 1  # флажок на ограничение количества объ�
 run = True
 while run:
     render()
+    draw_border()
+    # Graphics()
     pygame.display.flip()
 
     timer_move += 1
