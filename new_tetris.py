@@ -138,7 +138,7 @@ class Figure:
              + len(self.points[0])][pole[x:x + len(self.points), y:y +
                                        len(self.points[0])] == 1] = 0
         self.points = np.rot90(self.points, -1)
-        if (y + len(self.points[0])) > stack_width_cells:
+        if (y + len(self.points[0])) > stack_width_cells or (x + len(self.points)) > stack_height_cells:
             self.points = np.rot90(self.points)
             pole[x:x + len(self.points), y:y
                  + len(self.points[0])] += self.points
