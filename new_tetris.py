@@ -171,8 +171,10 @@ class Figure:
                 score += 100
 
 
-'''class Graphics:
-    def __init__(self):
+class Graphics:
+    def __init__(self, sound_on=1):
+        self.sound_on = sound_on
+        self.icons_coords = {}
         self.create_icons()
 
     def download_photo(self, name):
@@ -182,8 +184,25 @@ class Figure:
         pass
 
     def create_icons(self):
-        self.sound_icon = load_image('sound.png')
-        screen.blit(self.sound_icon, (300, 200))'''
+        image_x = 30
+        image_y = 30
+        if self.sound_on % 2:
+            self.sound_icon = load_image('sound.png')
+            screen.blit(self.sound_icon, (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size))
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.unpause()
+        else:
+            self.sound_icon = load_image('sound_off.png')
+            screen.blit(self.sound_icon, (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size))
+            pygame.mixer.music.pause()
+        self.icons_coords['sound'] = (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size, stack_width_cells * cell_size +
+                                      4 * cell_size + image_x, (stack_height_cells - 1) * cell_size + image_y)
+
+    def get_coords(self):
+        return self.icons_coords
 # фуdнкция отрисовки экрана
 
 
@@ -245,17 +264,22 @@ available_figures.remove(next_figures[1])
 available_figures.append(next_figures[0])
 
 
+fullname = os.path.join('data', 'music.mp3')
+pygame.mixer.music.load(fullname)
+pygame.mixer.music.play()
 fugire_counter = 0
 timer_falling = 0
 max_timer_falling = 60
 timer_move = 0
+sound_on = 0
+icons_coords = Graphics().get_coords()
 
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
 run = True
 while run:
     render()
     draw_border()
-    # Graphics()
+    Graphics(sound_on)
     pygame.display.flip()
 
     timer_move += 1
@@ -265,9 +289,12 @@ while run:
         mouse = pygame.mouse.get_pressed()
         if event.type == pygame.QUIT:
             run = False
-        # if event.type == pygame.MOUSEBUTTONUP:
-        #     if event.button == 4:
-        #         figure.rotate()
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                x, y = event.pos
+                coords = icons_coords['sound']
+                if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
+                    sound_on += 1
     if key[pygame.K_LEFT] and timer_move > 5:
         figure.left()
         timer_move = 0
@@ -280,7 +307,6 @@ while run:
     if key[pygame.K_DOWN] and timer_move > 5:
         timer_move = 0
         timer_falling = -1
-
     # if mouse[0] and timer_move > 5:
     #     figure.left()
     #     timer_move = 0
