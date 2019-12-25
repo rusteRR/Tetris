@@ -8,7 +8,7 @@ from random import choice
 stack_height_cells = 20
 stack_width_cells = 10
 cell_size = 20
-stack_width_px = stack_width_cells * cell_size + 140
+stack_width_px = stack_width_cells * cell_size + 150
 stack_height_px = stack_height_cells * cell_size + cell_size * 2
 top = 20
 left = 20
@@ -184,6 +184,11 @@ class Graphics:
         pass
 
     def create_icons(self):
+        self.create_sound_icon()
+        self.create_next_song_icon()
+        self.create_prev_song_icon()
+
+    def create_sound_icon(self):
         image_x = 30
         image_y = 30
         if self.sound_on % 2:
@@ -200,6 +205,29 @@ class Graphics:
         self.icons_coords['sound'] = (stack_width_cells * cell_size
                                           + 4 * cell_size, (stack_height_cells - 1) * cell_size, stack_width_cells * cell_size
                                       + 4 * cell_size + image_x, (stack_height_cells - 1) * cell_size + image_y)
+
+    def create_next_song_icon(self):
+        image_x = 20
+        image_y = 20
+        self.next_song_icon = load_image('next_song.png')
+        x = self.icons_coords['sound'][2] + 10
+        y = self.icons_coords['sound'][1] + 5
+        screen.blit(self.next_song_icon, (x, y, x + image_x, y + image_y))
+        self.icons_coords['next_song'] = (x, y, x + image_x, y + image_y)
+
+    def create_prev_song_icon(self):
+        image_x = 20
+        image_y = 20
+        self.prev_song_icon = load_image('prev_song.png')
+        x = self.icons_coords['sound'][0] - image_x - 10
+        y = self.icons_coords['sound'][1] + 5
+        screen.blit(self.prev_song_icon, (x, y, x + image_x, y + image_y))
+        self.icons_coords['prev_song'] = (x, y, x + image_x, y + image_y)
+
+    def change_music(self, i):
+        fullname = os.path.join('data', f'music{i % 7}.mp3')
+        pygame.mixer.music.load(fullname)
+        pygame.mixer.music.play(-1)
 
     def get_coords(self):
         return self.icons_coords
@@ -254,14 +282,15 @@ available_figures.remove(next_figures[1])
 available_figures.append(next_figures[0])
 
 
-fullname = os.path.join('data', 'music6.mp3')
+i = 0
+fullname = os.path.join('data', f'music{i}.mp3')
 pygame.mixer.music.load(fullname)
-pygame.mixer.music.play()
+pygame.mixer.music.play(-1)
 fugire_counter = 0
 timer_falling = 0
 max_timer_falling = 60
 timer_move = 0
-sound_on = 0
+sound_on = 1
 icons_coords = Graphics().get_coords()
 
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
@@ -285,6 +314,14 @@ while run:
                 coords = icons_coords['sound']
                 if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
                     sound_on += 1
+                coords = icons_coords['next_song']
+                if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
+                    i += 1
+                    Graphics().change_music(i)
+                coords = icons_coords['prev_song']
+                if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
+                    i -= 1
+                    Graphics().change_music(i)
     if key[pygame.K_LEFT] and timer_move > 5:
         figure.left()
         timer_move = 0
