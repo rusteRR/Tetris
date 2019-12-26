@@ -170,6 +170,11 @@ class Figure:
                     stack_height_cells, stack_width_cells)
                 score += 100
 
+    def secret(self):
+        global pole
+        pole = np.zeros(stack_width_cells *
+                        stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+
 
 class Graphics:
     def __init__(self, sound_on=1):
@@ -231,6 +236,8 @@ class Graphics:
 
     def get_coords(self):
         return self.icons_coords
+
+
 # фуdнкция отрисовки экрана
 
 
@@ -241,10 +248,6 @@ def render():
         for j in range(stack_width_cells):
             pygame.draw.rect(screen, pygame.Color(col[int(pole[i, j])]), (left + j * cell_size + 1,
                                                                           top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
-
-
-def next_figure(i):
-    return next_figures[i]
 
 
 def draw_border():
@@ -263,6 +266,10 @@ def draw_border():
                                          cell_size - 2, cell_size - 2), 0)
 
 
+def next_figure(i):
+    return next_figures[i]
+
+
 def load_image(name):
     fullname = os.path.join('data', name)
     image = pygame.image.load(fullname)
@@ -272,8 +279,10 @@ def load_image(name):
 
 im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
 
+
 available_figures = im.copy()
 next_figures = []
+
 
 next_figures.append(choice(available_figures))
 available_figures.remove(next_figures[0])
@@ -286,13 +295,15 @@ i = 0
 fullname = os.path.join('data', f'music{i}.mp3')
 pygame.mixer.music.load(fullname)
 pygame.mixer.music.play(-1)
+sound_on = 1
+icons_coords = Graphics().get_coords()
+
+
 fugire_counter = 0
 timer_falling = 0
 max_timer_falling = 60
 timer_move = 0
-sound_on = 1
-icons_coords = Graphics().get_coords()
-
+max_fugire_counter = 5
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
 run = True
 while run:
@@ -334,6 +345,8 @@ while run:
     if key[pygame.K_DOWN] and timer_move > 5:
         timer_move = 0
         timer_falling = -1
+    if key[pygame.K_c]:
+        figure.secret()
     # if mouse[0] and timer_move > 5:
     #     figure.left()
     #     timer_move = 0
@@ -347,9 +360,10 @@ while run:
     if timer_falling < 0:
         timer_falling = max_timer_falling
         figure.falling()
-        if fugire_counter > 5:
+        if fugire_counter > max_fugire_counter:
             fugire_counter = 0
             max_timer_falling -= 5
+            max_fugire_counter += 2
     else:
         timer_falling -= 1
 
