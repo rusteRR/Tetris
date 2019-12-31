@@ -26,8 +26,8 @@ figures = np.array([np.array([1, 1, 1, 0, 1, 0]),
 
 # инициализация игрового поля
 
-pole = np.zeros(stack_width_cells *
-                stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+pole = np.zeros(stack_width_cells
+                * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 # создание окна
 
@@ -58,6 +58,13 @@ class Figure:
         else:
             self.points = figures[im.index(form)].reshape(2, 3)
 
+        x, y = self.coords
+
+        pole[x:x + len(self.points), y:y + len(self.points[0])] += self.points
+
+    def stop(self):
+        self.tr = 0
+
     # функция падения спрайта
 
     def falling(self):
@@ -72,16 +79,16 @@ class Figure:
                 else:
                     tr = 0
         if tr == 1:
-            pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y + len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y + len(self.points[0])] == 1] = 0
             x += 1
             self.coords[0] += 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
-        else:
             pole[x:x + len(self.points), y:y
-                 + len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 2
+                 + len(self.points[0])] += self.points
+        else:
+            pole[x:x + len(self.points), y:y +
+                 len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                             len(self.points[0])] == 1] = 2
             self.tr = 0
             trg = 1
 
@@ -99,13 +106,13 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y
+                                           + len(self.points[0])] == 1] = 0
             y -= 1
             self.coords[1] -= 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
 
     # функция сдвига спрайта вправо
 
@@ -121,43 +128,43 @@ class Figure:
                 else:
                     tr = 0
         if tr:
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                           len(self.points[0])] == 1] = 0
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])][pole[x:x + len(self.points), y:y
+                                           + len(self.points[0])] == 1] = 0
             y += 1
             self.coords[1] += 1
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
 
     # функция поворота спрайта
 
     def rotate(self):
         global pole
         x, y = self.coords
-        pole[x:x + len(self.points), y:y +
-             len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                         len(self.points[0])] == 1] = 0
+        pole[x:x + len(self.points), y:y
+             + len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                       len(self.points[0])] == 1] = 0
         self.points = np.rot90(self.points, -1)
         if (y + len(self.points[0])) > stack_width_cells or (x + len(self.points)) > stack_height_cells:
             self.points = np.rot90(self.points)
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
         else:
             pole1 = self.points + \
                 pole[x:x + len(self.points), y:y + len(self.points[0])]
             self.points = np.rot90(self.points)
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
+            pole[x:x + len(self.points), y:y
+                 + len(self.points[0])] += self.points
             if not(3 in pole1):
-                pole[x:x + len(self.points), y:y +
-                     len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                                 len(self.points[0])] == 1] = 0
+                pole[x:x + len(self.points), y:y
+                     + len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                               len(self.points[0])] == 1] = 0
                 self.points = np.rot90(self.points, -1)
                 if (y + len(self.points[0])) > stack_width_cells:
                     self.points = np.rot90(self.points)
 
-                pole[x:x + len(self.points), y:y +
-                     len(self.points[0])] += self.points
+                pole[x:x + len(self.points), y:y
+                     + len(self.points[0])] += self.points
 
     # удаление полных слоёв
 
@@ -169,11 +176,6 @@ class Figure:
                 pole = np.insert(pole, 0, [0 for i in range(stack_width_cells)]).reshape(
                     stack_height_cells, stack_width_cells)
                 score += 100
-
-    def secret(self):
-        global pole
-        pole = np.zeros(stack_width_cells *
-                        stack_height_cells).reshape(stack_height_cells, stack_width_cells)
 
 
 class Graphics:
@@ -198,18 +200,18 @@ class Graphics:
         image_y = 30
         if self.sound_on % 2:
             self.sound_icon = load_image('sound.png')
-            screen.blit(self.sound_icon, (stack_width_cells * cell_size
-                                          + 4 * cell_size, (stack_height_cells - 1) * cell_size))
+            screen.blit(self.sound_icon, (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size))
             pygame.mixer.music.set_volume(0.5)
             pygame.mixer.music.unpause()
         else:
             self.sound_icon = load_image('sound_off.png')
-            screen.blit(self.sound_icon, (stack_width_cells * cell_size
-                                          + 4 * cell_size, (stack_height_cells - 1) * cell_size))
+            screen.blit(self.sound_icon, (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size))
             pygame.mixer.music.pause()
-        self.icons_coords['sound'] = (stack_width_cells * cell_size
-                                          + 4 * cell_size, (stack_height_cells - 1) * cell_size, stack_width_cells * cell_size
-                                      + 4 * cell_size + image_x, (stack_height_cells - 1) * cell_size + image_y)
+        self.icons_coords['sound'] = (stack_width_cells * cell_size +
+                                          4 * cell_size, (stack_height_cells - 1) * cell_size, stack_width_cells * cell_size +
+                                      4 * cell_size + image_x, (stack_height_cells - 1) * cell_size + image_y)
 
     def create_next_song_icon(self):
         image_x = 20
@@ -238,12 +240,19 @@ class Graphics:
         return self.icons_coords
 
 
+def new_game():
+    global pole
+    figure.stop()
+    pole = np.zeros(stack_width_cells *
+                    stack_height_cells).reshape(stack_height_cells, stack_width_cells)
+
+
 # фуdнкция отрисовки экрана
 
 
 def render():
     screen.fill(pygame.Color('black'))
-    col = ['white', 'green', 'yellow']
+    col = ['white', 'green', 'yellow', 'red', 'black', 'orange', 'blue']
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             pygame.draw.rect(screen, pygame.Color(col[int(pole[i, j])]), (left + j * cell_size + 1,
@@ -291,7 +300,7 @@ available_figures.remove(next_figures[1])
 available_figures.append(next_figures[0])
 
 
-i = 0
+i = 3
 fullname = os.path.join('data', f'music{i}.mp3')
 pygame.mixer.music.load(fullname)
 pygame.mixer.music.play(-1)
@@ -345,8 +354,11 @@ while run:
     if key[pygame.K_DOWN] and timer_move > 5:
         timer_move = 0
         timer_falling = -1
-    if key[pygame.K_c]:
-        figure.secret()
+    if key[pygame.K_n]:
+        new_game()
+    if (3 in pole) or (4 in pole) or (5 in pole):
+        pygame.time.wait(2000)
+        new_game()
     # if mouse[0] and timer_move > 5:
     #     figure.left()
     #     timer_move = 0

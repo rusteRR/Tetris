@@ -4,8 +4,8 @@ from random import choice
 
 # переменный экрана
 
-stack_height_cells = 16
-stack_width_cells = 8
+stack_height_cells = 30
+stack_width_cells = 20
 cell_size = 20
 stack_width_px = stack_width_cells * cell_size
 stack_height_px = stack_height_cells * cell_size
