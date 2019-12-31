@@ -300,11 +300,11 @@ available_figures.remove(next_figures[1])
 available_figures.append(next_figures[0])
 
 
-i = 3
+i = 0
 fullname = os.path.join('data', f'music{i}.mp3')
 pygame.mixer.music.load(fullname)
 pygame.mixer.music.play(-1)
-sound_on = 1
+sound_on = 0
 icons_coords = Graphics().get_coords()
 
 
