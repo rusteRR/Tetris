@@ -194,6 +194,16 @@ class Graphics:
         self.create_sound_icon()
         self.create_next_song_icon()
         self.create_prev_song_icon()
+        self.create_new_game_icon()
+
+    def create_new_game_icon(self):
+        image_x = 90
+        image_y = 40
+        self.new_game_icon = load_image('new_game.png')
+        x, y = self.icons_coords['prev_song'][0], self.icons_coords['prev_song'][1] - 50
+        screen.blit(self.new_game_icon, (x, y, x + image_x, y + image_y))
+        self.icons_coords['new_game'] = (
+            x, y + 10, x + image_x, y + image_y - 10)
 
     def create_sound_icon(self):
         image_x = 30
@@ -263,17 +273,19 @@ def render():
 def draw_border():
     color = (80, 80, 80)
     for i in range(stack_height_cells + 2):
-        pygame.draw.rect(screen, color, (0, i * cell_size + 1,
-                                         cell_size - 1, cell_size - 2), 0)
+        pygame.draw.rect(screen, color, (left - cell_size,
+                                         top - cell_size + cell_size * i + 1, cell_size - 1, cell_size - 2), 0)
     for i in range(stack_height_cells + 2):
-        pygame.draw.rect(screen, color, (left + stack_width_cells * cell_size + 1, i * cell_size + 1,
-                                         cell_size, cell_size - 2), 0)
+        pygame.draw.rect(screen, color, (left + cell_size * stack_width_cells + 1,
+                                         top - cell_size + cell_size * i + 1, cell_size - 1, cell_size - 2), 0)
+
     for i in range(stack_width_cells):
-        pygame.draw.rect(screen, color, (left + 1 + i * cell_size, 1,
-                                         cell_size - 2, cell_size - 2), 0)
+        pygame.draw.rect(screen, color, (left + cell_size * i + 1,
+                                         top - cell_size + 1, cell_size - 2, cell_size - 2), 0)
+
     for i in range(stack_width_cells):
-        pygame.draw.rect(screen, color, (left + 1 + i * cell_size, top + stack_height_cells * cell_size + 1,
-                                         cell_size - 2, cell_size - 2), 0)
+        pygame.draw.rect(screen, color, (left + cell_size * i + 1,
+                                         top + stack_height_cells * cell_size + 1, cell_size - 2, cell_size - 2), 0)
 
 
 def next_figure(i):
@@ -353,6 +365,9 @@ while run:
                 if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
                     i -= 1
                     Graphics().change_music(i)
+                coords = icons_coords['new_game']
+                if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
+                    new_game()
     # if key[pygame.K_LEFT] and timer_move > 5:
     #     figure.left()
     #     timer_move = 0
