@@ -1,4 +1,5 @@
 import pygame
+import keyboard
 import numpy as np
 import os
 from random import choice
@@ -43,7 +44,7 @@ fps = 60
 
 class Figure:
     def __init__(self, form):
-        global figures, im
+        global figures, im, pole
 
         self.tr = 1  # флажок на остановку спрайта
         self.form = form  # форма спрайта
@@ -59,7 +60,6 @@ class Figure:
             self.points = figures[im.index(form)].reshape(2, 3)
 
         x, y = self.coords
-
         pole[x:x + len(self.points), y:y + len(self.points[0])] += self.points
 
     def stop(self):
@@ -74,7 +74,7 @@ class Figure:
         for i in range(len(self.points)):
             for j in range(len(self.points[i])):
                 if (x + len(self.points)) + 1 <= stack_height_cells:
-                    if (pole[x + i + 1][y + j] == 3 or pole[x + i + 1][y + j] == 2 or self.tr == 0) and self.points[i][j] == 1:
+                    if ((pole[x + i + 1][y + j] == 3 or pole[x + i + 1][y + j] == 2) and self.points[i][j] == 1) or self.tr == 0:
                         tr = 0  # локальный флажок на условие сдвига вниз спрайта
                 else:
                     tr = 0
@@ -252,7 +252,8 @@ def new_game():
 
 def render():
     screen.fill(pygame.Color('black'))
-    col = ['white', 'green', 'yellow', 'red', 'black', 'orange', 'blue']
+    col = ['white', 'green', 'yellow', 'red',
+           'black', 'orange', 'blue', 'purple']
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             pygame.draw.rect(screen, pygame.Color(col[int(pole[i, j])]), (left + j * cell_size + 1,
@@ -285,6 +286,20 @@ def load_image(name):
     image = image.convert_alpha()
     return image
 
+
+def move(e):
+    if e.event_type == 'down':
+        if e.name == 'up':
+            figure.rotate()
+        if e.name == 'left':
+            figure.left()
+        if e.name == 'right':
+            figure.right()
+        if e.name == 'down':
+            figure.falling()
+
+
+keyboard.hook(move)
 
 im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
 
@@ -342,18 +357,18 @@ while run:
                 if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
                     i -= 1
                     Graphics().change_music(i)
-    if key[pygame.K_LEFT] and timer_move > 5:
-        figure.left()
-        timer_move = 0
-    if key[pygame.K_RIGHT] and timer_move > 5:
-        figure.right()
-        timer_move = 0
-    if key[pygame.K_UP] and timer_move > 10:
-        figure.rotate()
-        timer_move = 0
-    if key[pygame.K_DOWN] and timer_move > 5:
-        timer_move = 0
-        timer_falling = -1
+    # if key[pygame.K_LEFT] and timer_move > 5:
+    #     figure.left()
+    #     timer_move = 0
+    # if key[pygame.K_RIGHT] and timer_move > 5:
+    #     figure.right()
+    #     timer_move = 0
+    # if key[pygame.K_UP] and timer_move > 10:
+    #     figure.rotate()
+    #     timer_move = 0
+    # if key[pygame.K_DOWN] and timer_move > 5:
+    #     timer_move = 0
+    #     timer_falling = -1
     if key[pygame.K_n]:
         new_game()
     if (3 in pole) or (4 in pole) or (5 in pole):
@@ -369,6 +384,15 @@ while run:
     #     timer_move = 0
     #     timer_falling = -1
 
+    if trg:
+        figure = Figure(next_figures.pop(0))
+        next_figures.append(choice(available_figures))
+        available_figures.remove(next_figures[1])
+        available_figures.append(next_figures[0])
+
+        trg = 0
+        fugire_counter += 1
+
     if timer_falling < 0:
         timer_falling = max_timer_falling
         figure.falling()
@@ -379,17 +403,8 @@ while run:
     else:
         timer_falling -= 1
 
-    if trg:
-        figure = Figure(next_figures.pop(0))
-        next_figures.append(choice(available_figures))
-        available_figures.remove(next_figures[1])
-        available_figures.append(next_figures[0])
-
-        trg = 0
-        fugire_counter += 1
-
     figure.checkout()
     clock.tick(fps)
-
+    # keyboard.wait()
 print('Your score', score)
 pygame.quit()
