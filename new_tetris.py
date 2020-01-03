@@ -322,8 +322,9 @@ def checkout():
 
 
 def new_game():
-    global pole, score
+    global pole, score, trr
     figure.stop()
+    trr = 1
     pole = np.zeros(stack_width_cells *
                     stack_height_cells).reshape(stack_height_cells, stack_width_cells)
     max_timer_falling = 60
@@ -335,8 +336,8 @@ def new_game():
 
 def render():
     screen.fill(pygame.Color('black'))
-    fig_col = ['purple', 'orange', 'dark blue',
-               'green', 'red', 'blue', 'yellow', 'black', 'black', 'black', 'black']
+    fig_col = ['purple', 'orange', 'dark blue', 'green', 'red', 'blue', 'yellow', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black',
+               'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black']
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             if int(pole[i, j]) != 0:
@@ -414,6 +415,7 @@ max_timer_falling = 60
 timer_move = 0
 max_fugire_counter = 5
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
+trr = 1
 run = True
 while run:
     render()
@@ -462,6 +464,9 @@ while run:
     # if (3 in pole) or (4 in pole) or (5 in pole):
     #     pygame.time.wait(2000)
     #     new_game()
+    a = pole > 7
+    if np.any(a):
+        trr = 0
     # if mouse[0] and timer_move > 5:
     #     figure.left()
     #     timer_move = 0
@@ -472,7 +477,7 @@ while run:
     #     timer_move = 0
     #     timer_falling = -1
 
-    if trg:
+    if trg and trr:
         figure = Figure(next_figures.pop(0))
         next_figures.append(choice(available_figures))
         available_figures.remove(next_figures[1])
