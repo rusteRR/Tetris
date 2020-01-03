@@ -343,6 +343,7 @@ def new_game():
     pole = np.zeros(stack_width_cells
                     * stack_height_cells).reshape(stack_height_cells, stack_width_cells)
     max_timer_falling = 60
+    max_figure_counter = 5
     score = 0
 
 
