@@ -1,8 +1,8 @@
 import pygame
-import keyboard
 import numpy as np
-import os
 from random import choice
+import os
+import keyboard
 
 # переменные экрана
 
@@ -35,12 +35,8 @@ pole = np.zeros(stack_width_cells
 
 pygame.init()
 screen = pygame.display.set_mode((stack_width_px, stack_height_px))
-screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 fps = 60
-
-
-# класс спрайтов
 
 
 class Figure:
@@ -70,7 +66,7 @@ class Figure:
     def get_col(self):
         return self.col
 
-    # функция падения спрайта
+    # функция падения
 
     def falling(self):
         global pole, trg
@@ -203,27 +199,6 @@ class Graphics:
         fullname = next_fig + '_fig.PNG'
         image = load_image(fullname)
         screen.blit(image, sp[s.index(next_fig)])
-        # if next_fig == 'I':
-        #     image = load_image('I_fig.PNG')
-        #     screen.blit(image, (x + 15, y + 60))
-        # elif next_fig == 'S':
-        #     image = load_image('S_fig.PNG')
-        #     screen.blit(image, (x + 15, y + 50))
-        # elif next_fig == 'Z':
-        #     image = load_image('Z_fig.PNG')
-        #     screen.blit(image, (x + 15, y + 50))
-        # elif next_fig == 'T':
-        #     image = load_image('T_fig.PNG')
-        #     screen.blit(image, (x + 15, y + 50))
-        # elif next_fig == 'O':
-        #     image = load_image('O_fig.PNG')
-        #     screen.blit(image, (x + 30, y + 50))
-        # elif next_fig == 'L':
-        #     image = load_image('L_fig.PNG')
-        #     screen.blit(image, (x + 20, y + 50))
-        # elif next_fig == 'J':
-        #     image = load_image('J_fig.PNG')
-        #     screen.blit(image, (x + 20, y + 50))
 
     def draw_score(self):
         num_str = str(self.score)
@@ -298,6 +273,7 @@ class Graphics:
     def get_coords(self):
         return self.icons_coords
 
+
 # удаление полных слоёв
 
 
@@ -316,7 +292,7 @@ def checkout():
             pole = np.insert(pole, 0, [0 for i in range(stack_width_cells)]).reshape(
                 stack_height_cells, stack_width_cells)
             k += 1
-    sc = [100, 300, 700, 1500]
+    sc = [100, 300, 700, 1500, 3100, 6300, 12500, 25100]
     if k > 0:
         score += sc[k - 1]
 
@@ -336,13 +312,17 @@ def new_game():
 
 def render():
     screen.fill(pygame.Color('black'))
-    fig_col = ['purple', 'orange', 'dark blue', 'green', 'red', 'blue', 'yellow', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black',
-               'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black']
+    fig_col = ['purple', 'orange', 'blue',
+               'green', 'red', 'cyan', 'yellow']
+    fig_col = [(205, 0, 205), (255, 140, 15), (20, 15, 255),
+               (105, 255, 0), (255, 5, 0), (0, 255, 255), (245, 220, 10)]
+    for i in range(7):
+        fig_col.append('black')
     for i in range(stack_height_cells):
         for j in range(stack_width_cells):
             if int(pole[i, j]) != 0:
-                pygame.draw.rect(screen, pygame.Color(fig_col[abs(int(pole[i, j])) - 1]), (left + j * cell_size + 1,
-                                                                                           top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
+                pygame.draw.rect(screen, fig_col[abs(int(pole[i, j])) - 1], (left + j * cell_size + 1,
+                                                                             top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
             elif int(pole[i, j]) == 0:
                 pygame.draw.rect(screen, pygame.Color('white'), (left + j * cell_size + 1,
                                                                  top + i * cell_size + 1, cell_size - 2, cell_size - 2), 0)
@@ -387,12 +367,11 @@ def move(e):
 
 keyboard.hook(move)
 
-im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
 
+im = ['T', 'L', 'J', 'S', 'Z', 'I', 'O']
 
 available_figures = im.copy()
 next_figures = []
-
 
 next_figures.append(choice(available_figures))
 available_figures.remove(next_figures[0])
@@ -447,12 +426,6 @@ while run:
                 coords = icons_coords['new_game']
                 if coords[0] <= x <= coords[2] and coords[1] <= y <= coords[3]:
                     new_game()
-    # if key[pygame.K_LEFT] and timer_move > 5:
-    #     figure.left()
-    #     timer_move = 0
-    # if key[pygame.K_RIGHT] and timer_move > 5:
-    #     figure.right()
-    #     timer_move = 0
     if key[pygame.K_UP] and timer_move > 10:
         figure.rotate()
         timer_move = 0
@@ -461,21 +434,10 @@ while run:
         timer_falling = -1
     if key[pygame.K_n]:
         new_game()
-    # if (3 in pole) or (4 in pole) or (5 in pole):
-    #     pygame.time.wait(2000)
-    #     new_game()
+
     a = pole > 7
     if np.any(a):
         trr = 0
-    # if mouse[0] and timer_move > 5:
-    #     figure.left()
-    #     timer_move = 0
-    # if mouse[2] and timer_move > 5:
-    #     figure.right()
-    #     timer_move = 0
-    # if mouse[1] and timer_move > 5:
-    #     timer_move = 0
-    #     timer_falling = -1
 
     if trg and trr:
         figure = Figure(next_figures.pop(0))
