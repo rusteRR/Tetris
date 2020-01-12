@@ -166,30 +166,31 @@ class Figure:
     def rotate(self):
         global pole
         x, y = self.coords
-        pole[x:x + len(self.points), y:y +
-             len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                         len(self.points[0])] == self.col] = 0
-        self.points = np.rot90(self.points, -1)
-        if (y + len(self.points[0])) > stack_width_cells or (x + len(self.points)) > stack_height_cells:
-            self.points = np.rot90(self.points)
+        if self.tr:
             pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
-        else:
-            pole1 = self.points * \
-                pole[x:x + len(self.points), y:y + len(self.points[0])]
-            self.points = np.rot90(self.points)
-            pole[x:x + len(self.points), y:y +
-                 len(self.points[0])] += self.points
-            if not(np.any(pole1)):
-                pole[x:x + len(self.points), y:y +
-                     len(self.points[0])][pole[x:x + len(self.points), y:y +
-                                                 len(self.points[0])] == self.col] = 0
-                self.points = np.rot90(self.points, -1)
-                if (y + len(self.points[0])) > stack_width_cells:
-                    self.points = np.rot90(self.points)
-
+                 len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                             len(self.points[0])] == self.col] = 0
+            self.points = np.rot90(self.points, -1)
+            if (y + len(self.points[0])) > stack_width_cells or (x + len(self.points)) > stack_height_cells:
+                self.points = np.rot90(self.points)
                 pole[x:x + len(self.points), y:y +
                      len(self.points[0])] += self.points
+            else:
+                pole1 = self.points * \
+                    pole[x:x + len(self.points), y:y + len(self.points[0])]
+                self.points = np.rot90(self.points)
+                pole[x:x + len(self.points), y:y +
+                     len(self.points[0])] += self.points
+                if not(np.any(pole1)):
+                    pole[x:x + len(self.points), y:y +
+                         len(self.points[0])][pole[x:x + len(self.points), y:y +
+                                                     len(self.points[0])] == self.col] = 0
+                    self.points = np.rot90(self.points, -1)
+                    if (y + len(self.points[0])) > stack_width_cells:
+                        self.points = np.rot90(self.points)
+
+                    pole[x:x + len(self.points), y:y +
+                         len(self.points[0])] += self.points
 
 
 # класс графического оформления игры
@@ -521,6 +522,7 @@ max_timer_falling = 60
 timer_move = 0
 max_figure_counter = 5
 
+t = 1
 trg = 1  # флажок на ограничение количества объектов на поле одновремено
 trr = 1  # флажок на полную остановку игры
 run = True
@@ -539,6 +541,9 @@ while run:
         mouse = pygame.mouse.get_pressed()
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_n:
+                new_game()
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 x, y = event.pos
@@ -574,9 +579,6 @@ while run:
         timer_move = 0
         timer_falling = -1
         score += 1
-
-    if key[pygame.K_n]:
-        new_game()
 
     a = pole > 7
     if np.any(a):
